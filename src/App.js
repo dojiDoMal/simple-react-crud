@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ref, set, onValue, update, remove } from 'firebase/database';
 import { database } from './firebase';
 
@@ -10,6 +10,7 @@ function App() {
   const [editingItem, setEditingItem] = useState(null);
   const [editedValue, setEditedValue] = useState('');
   const [editedDescription, setEditedDescription] = useState('');
+  const inputRef = useRef(null);
 
   // Fetch items from Firebase
   useEffect(() => {
@@ -59,9 +60,24 @@ function App() {
     setEditedDescription('');
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (inputRef.current && !inputRef.current.contains(event.target)) {
+        setEditingItem(null); // Stop editing if clicked outside
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="App">
-      <h1>Firebase CRUD App with Description</h1>
+      <h1>Escolha um presente!</h1>
+      <h2>Digite seu nome completo e confirme.</h2>
 
       {process.env.REACT_APP_AMBIENTE === "local" && (
         <>
@@ -81,27 +97,48 @@ function App() {
         </>
       )}
 
-      <div style={{	display: "flex", flexDirection: "column", alignItems: "center" }}>
-        {items.map((item) => (
-          <div style={{alignItems: "center", width: "100%", display: "flex", justifyContent: "start"}} key={item.id}>
-            {(
-              <>
-                <strong style={{width: "150px",overflow: "hidden",textWrap: "nowrap",textOverflow: "ellipsis"}}>{item.text}</strong>
-                <input
-                  type="text"
-                  minLength="3"
-                  maxLength="50"
-                  value={editingItem?.id == item.id ? editedDescription : item.description}
-                  pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+"
-                  placeholder="Edit item description"
-                  onCdivk={() => startEdit(item)}
-                  onChange={(e) => setEditedDescription(e.target.value)}
-                />
-                <button onClick={saveEdit}>Confirmar</button>
-              </>
-            )}
-          </div>
-        ))}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        {items.map((item) => {
+          if (!item.description) {
+            return (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginBottom: "8px",
+                  width: "100%",
+                  justifyContent: "start"
+                }} key={item.id}>
+                {(
+                  <>
+                    {/* <strong style={{width: "150px",overflow: "hidden",textWrap: "nowrap",textOverflow: "ellipsis"}}>{item.text}</strong> */}
+                    <label
+                      style={{ fontSize: "22px" }}
+                      htmlFor={item.id}
+                    >
+                      {item.text}
+                    </label>
+                    <div style={{ display: "flex", flexDirection: "row" }}>
+                      <input
+                        ref={inputRef}
+                        id={item.id}
+                        type="text"
+                        minLength="3"
+                        maxLength="50"
+                        value={editingItem?.id == item.id ? editedDescription : item.description}
+                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+"
+                        placeholder="Nome completo"
+                        onClick={() => startEdit(item)}
+                        onChange={(e) => setEditedDescription(e.target.value)}
+                      />
+                      <button disabled={!editingItem || editingItem.id != item.id} onClick={saveEdit}>Confirmar</button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )
+          }
+        })}
       </div>
     </div>
   );
