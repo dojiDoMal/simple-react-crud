@@ -54,25 +54,12 @@ function App() {
   // Save edited item to Firebase
   const saveEdit = () => {
     const itemRef = ref(database, `items/${editingItem.id}`);
-    update(itemRef, { text: editedValue, description: editedDescription });
-    setEditingItem(null);
-    setEditedValue('');
-    setEditedDescription('');
+    update(itemRef, { text: editedValue, description: editedDescription }).then(() => {
+      setEditingItem(null);
+      setEditedValue('');
+      setEditedDescription('');
+    });
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (inputRef.current && !inputRef.current.contains(event.target)) {
-        setEditingItem(null); // Stop editing if clicked outside
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   return (
     <div className="App">
@@ -131,7 +118,12 @@ function App() {
                         onClick={() => startEdit(item)}
                         onChange={(e) => setEditedDescription(e.target.value)}
                       />
-                      <button disabled={!editingItem || editingItem.id != item.id} onClick={saveEdit}>Confirmar</button>
+                      <button 
+                        disabled={editingItem?.id != item.id}
+                        onClick={() => {saveEdit()}}
+                      >
+                        Confirmar
+                      </button>
                     </div>
                   </>
                 )}
