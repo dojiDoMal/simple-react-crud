@@ -10,6 +10,7 @@ function App() {
   const [editingItem, setEditingItem] = useState(null);
   const [editedValue, setEditedValue] = useState('');
   const [editedDescription, setEditedDescription] = useState('');
+  const [showConfirm, setShowConfirm] = useState(false);
   const inputRef = useRef(null);
 
   // Fetch items from Firebase
@@ -19,7 +20,7 @@ function App() {
       const data = snapshot.val();
       const itemList = data ? Object.keys(data).map((key) => ({ id: key, ...data[key] })) : [];
       setItems(itemList);
-    });
+    }, (err) => {console.log(err)});
   }, []);
 
   // Add item with description to Firebase
@@ -112,25 +113,34 @@ function App() {
                         type="text"
                         minLength="3"
                         maxLength="50"
-                        value={editingItem?.id == item.id ? editedDescription : item.description}
+                        value={editingItem?.id === item.id ? editedDescription : item.description}
                         pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+"
                         placeholder="Nome completo"
                         onClick={() => startEdit(item)}
                         onChange={(e) => setEditedDescription(e.target.value)}
                       />
                       <button 
-                        disabled={editingItem?.id != item.id}
-                        onClick={() => {saveEdit()}}
+                        disabled={editingItem?.id !== item.id}
+                        onClick={() => {
+                          setShowConfirm(true);
+                        }}
                       >
                         Confirmar
                       </button>
-                    </div>
+                    </div>                    
                   </>
                 )}
               </div>
             )
           }
         })}
+        {showConfirm && (
+          <div className={`confirmation-box ${showConfirm ? "show" : ""}`}>
+            <p>Deseja salvar as alterações?</p>
+            <button onClick={() => saveEdit()}>Sim</button>
+            <button onClick={() => setShowConfirm(false)}>Cancelar</button>
+          </div>
+        )}
       </div>
     </div>
   );
