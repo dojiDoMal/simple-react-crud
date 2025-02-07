@@ -1,0 +1,46 @@
+.confirmation-box {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: calc(100% - 20px);
+  background-color: white;
+  box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  display: flex;
+  opacity: 0;
+  flex-direction: column;
+}
+
+/* Fade-in animation */
+.confirmation-box.fade-in {
+  animation: fade-in 0.25s ease-in forwards;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(150px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade-out animation */
+.confirmation-box.fade-out {
+  animation: fade-out 0.25s ease-in forwards;
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(150px);
+  }
+}

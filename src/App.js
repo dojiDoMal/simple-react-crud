@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ref, set, onValue, update, remove } from 'firebase/database';
+import { ref, set, onValue, update } from 'firebase/database';
 import { database } from './firebase';
-
+import ConfirmationBox from './ConfirmationBox';
 
 function App() {
   const [items, setItems] = useState([]);
@@ -38,12 +38,6 @@ function App() {
     item.description = e.target.value;
     console.log(item)
   }
-
-  // Delete item from Firebase
-  const deleteItem = (id) => {
-    const itemRef = ref(database, `items/${id}`);
-    remove(itemRef);
-  };
 
   // Start editing item
   const startEdit = (item) => {
@@ -99,7 +93,6 @@ function App() {
                 }} key={item.id}>
                 {(
                   <>
-                    {/* <strong style={{width: "150px",overflow: "hidden",textWrap: "nowrap",textOverflow: "ellipsis"}}>{item.text}</strong> */}
                     <label
                       style={{ fontSize: "22px" }}
                       htmlFor={item.id}
@@ -125,7 +118,7 @@ function App() {
                           setShowConfirm(true);
                         }}
                       >
-                        Confirmar
+                        {"Confirmar"}
                       </button>
                     </div>                    
                   </>
@@ -135,11 +128,19 @@ function App() {
           }
         })}
         {showConfirm && (
-          <div className={`confirmation-box ${showConfirm ? "show" : ""}`}>
-            <p>Deseja salvar as alterações?</p>
-            <button onClick={() => saveEdit()}>Sim</button>
-            <button onClick={() => setShowConfirm(false)}>Cancelar</button>
-          </div>
+          <ConfirmationBox 
+            title={`Você escolheu: ${editingItem.text}`}
+            description="Confirma sua escolha?" 
+            onConfirm={() => {
+              setTimeout(() => setShowConfirm(false), 250);
+              saveEdit();
+            }}
+            confirmText="Sim"
+            onCancel={() => {
+              setTimeout(() => setShowConfirm(false), 250);
+            }}
+            cancelText="Não"
+          />
         )}
       </div>
     </div>
