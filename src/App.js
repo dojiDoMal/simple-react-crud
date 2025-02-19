@@ -33,12 +33,6 @@ function App() {
     }
   };
 
-  const handleItemDescriptionChange = (e, itemId) => {
-    let item = items.filter(({ id }) => itemId == id);
-    item.description = e.target.value;
-    console.log(item)
-  }
-
   // Start editing item
   const startEdit = (item) => {
     setEditingItem(item);
@@ -126,6 +120,7 @@ function App() {
               </div>
             )
           }
+          return null;
         })}
         {showConfirm && (
           <ConfirmationBox 
